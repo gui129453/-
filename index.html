@@ -1,0 +1,2572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>浮世录 · 星轨关系网</title>
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- 英文字体 -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cormorant+Garamond:wght@300;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* ===== 全局样式 ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
+        body {
+            min-height: 100vh;
+            background: radial-gradient(ellipse at 40% 40%, #1a0b2e 0%, #0a0a1f 60%, #030314 100%);
+            font-family: 'Cormorant Garamond', serif;
+            color: #f0e9ff;
+            position: relative;
+            padding: 0;
+            overflow-x: hidden;
+        }
+        /* 银河繁星背景 */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: url('data:image/svg+xml;utf8,<svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="glow" cx="30%" cy="40%" r="70%"><stop offset="0%" stop-color="%23a57cf2" stop-opacity="0.3"/><stop offset="70%" stop-color="%2330288e" stop-opacity="0.1"/><stop offset="100%" stop-color="%23000030" stop-opacity="0.8"/></radialGradient></defs><rect width="100%" height="100%" fill="url(%23glow)"/><circle cx="15%" cy="20%" r="2" fill="white" opacity="0.7"/><circle cx="80%" cy="15%" r="3" fill="%23b5b0ff" opacity="0.6"/><circle cx="62%" cy="83%" r="4" fill="%238a6dee" opacity="0.5"/><circle cx="45%" cy="70%" r="2.5" fill="%23dbbaff" opacity="0.8"/><circle cx="91%" cy="48%" r="5" fill="%234b3b8c" opacity="0.4"/><circle cx="7%" cy="66%" r="3" fill="%23c1a0ff" opacity="0.7"/><circle cx="33%" cy="92%" r="2" fill="%23a48bdf" opacity="0.6"/><circle cx="74%" cy="31%" r="4" fill="%23e0c7ff" opacity="0.5"/></svg>') repeat;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ===== 登录页 ===== */
+        .login-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(5, 0, 20, 0.95);
+            backdrop-filter: blur(15px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            transition: opacity 0.5s ease;
+        }
+        .login-card {
+            width: 85%;
+            max-width: 400px;
+            background: #13082b;
+            border: 3px solid #ad84f0;
+            border-radius: 60px;
+            padding: 30px 25px;
+            box-shadow: 0 0 120px #6c40c4;
+            text-align: center;
+            animation: floatIn 0.6s cubic-bezier(0.2, 0.9, 0.3, 1);
+        }
+        @keyframes floatIn {
+            0% { opacity: 0; transform: translateY(30px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .login-title {
+            font-family: 'Cinzel', serif;
+            font-size: 48px;
+            font-weight: 900;
+            letter-spacing: 8px;
+            background: linear-gradient(135deg, #f0eaff, #c7b5ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+        }
+        .login-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .login-tab {
+            flex: 1;
+            padding: 10px;
+            background: #221740;
+            border: 2px solid #7b5ec9;
+            border-radius: 40px;
+            color: #bcaaf0;
+            font-size: 24px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .login-tab.active {
+            background: #4a2c8a;
+            color: white;
+            border-color: #d9b0ff;
+        }
+        .login-input {
+            width: 100%;
+            background: #221740;
+            border: 2px solid #7b5ec9;
+            border-radius: 60px;
+            padding: 14px 20px;
+            font-size: 20px;
+            color: white;
+            font-family: 'Cormorant Garamond', serif;
+            margin: 10px 0;
+        }
+        .login-error {
+            color: #ff6b8b;
+            font-size: 18px;
+            margin: 10px 0;
+            min-height: 30px;
+            text-align: left;
+            padding-left: 10px;
+        }
+        .login-btn {
+            background: #3b2470;
+            border: 2px solid #bba2ff;
+            border-radius: 60px;
+            padding: 14px;
+            font-size: 26px;
+            color: white;
+            width: 100%;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 10px;
+        }
+        .login-btn:active { background: #6441b5; transform: scale(0.97); }
+
+        /* 返回按钮 */
+        .back-btn {
+            position: fixed;
+            top: 20px; left: 20px;
+            width: 48px; height: 48px;
+            background: rgba(25,15,55,0.9);
+            border: 2px solid #9f8bef;
+            border-radius: 40px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 28px; color: #cfc2ff;
+            cursor: pointer;
+            box-shadow: 0 0 15px #7366c0;
+            z-index: 100;
+            transition: transform 0.2s;
+        }
+        .back-btn:active { transform: scale(0.9); }
+
+        /* 刷新按钮 */
+        .refresh-btn {
+            position: fixed;
+            top: 20px; right: 80px;
+            width: 48px; height: 48px;
+            background: rgba(25,15,55,0.9);
+            border: 2px solid #9f8bef;
+            border-radius: 40px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 28px; color: #cfc2ff;
+            cursor: pointer;
+            box-shadow: 0 0 15px #7366c0;
+            z-index: 100;
+            transition: transform 0.2s;
+        }
+        .refresh-btn:active { transform: scale(0.9) rotate(180deg); }
+
+        /* 删除区域 */
+        .delete-zone {
+            position: fixed;
+            bottom: 0; left: 0; width: 100%;
+            height: 100px;
+            background: linear-gradient(to top, #ff4d4d, transparent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            z-index: 200;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .delete-zone.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* 通知弹窗 */
+        .notification {
+            position: fixed;
+            top: 20px; right: 20px;
+            background: #13082b;
+            border: 2px solid #d9b0ff;
+            border-radius: 30px;
+            padding: 15px;
+            max-width: 300px;
+            color: white;
+            z-index: 10000;
+            box-shadow: 0 0 50px #b476ff;
+            animation: slideIn 0.3s;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+        .notification .close-notif {
+            float: right;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        /* 主界面容器 */
+        .app-container {
+            max-width: 500px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+            padding: 10px 10px 0;
+            opacity: 1;
+            transition: opacity 0.4s;
+        }
+        .hidden { display: none !important; }
+
+        /* 主卡片 */
+        .left-archive {
+            background: rgba(12, 8, 28, 0.7);
+            backdrop-filter: blur(20px);
+            border-radius: 42px;
+            padding: 20px 16px;
+            border: 1px solid rgba(160, 130, 255, 0.4);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+            margin-top: 60px;
+        }
+
+        /* 标题栏 */
+        .title-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+        .icon-btn {
+            width: 48px; height: 48px;
+            background: rgba(25,15,55,0.9);
+            border: 2px solid #9f8bef;
+            border-radius: 40px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 28px; color: #cfc2ff;
+            cursor: pointer;
+            box-shadow: 0 0 15px #7366c0;
+            transition: transform 0.2s, background 0.2s;
+        }
+        .icon-btn:active { transform: scale(1.08) rotate(90deg); background: #4a2c8a; }
+        .main-title {
+            font-family: 'Cinzel', serif;
+            font-size: 44px; font-weight: 900;
+            letter-spacing: 6px;
+            text-shadow: 0 0 20px #7f5af0;
+            background: linear-gradient(135deg,#f0eaff,#c7b5ff,#a882ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            white-space: nowrap;
+        }
+        .main-sub {
+            font-size: 16px; letter-spacing: 4px; color: #b7a4ff;
+            text-align: center; border-bottom: 1px dashed #6e54b0;
+            padding-bottom: 12px; margin-bottom: 20px;
+        }
+
+        /* 三入口 */
+        .entry-row {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+        .entry-item {
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .entry-item:active { transform: scale(0.95); }
+        .entry-icon {
+            font-size: 36px;
+            color: #d3c5ff;
+            text-shadow: 0 0 20px #a36ef0;
+        }
+        .entry-label {
+            font-size: 18px;
+            font-family: 'Cinzel';
+            color: #bcaaf0;
+        }
+
+        /* 卡片网格 */
+        .character-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 10px 0;
+            justify-content: center;
+        }
+        .character-card {
+            width: 140px;
+            background: rgba(16,6,36,0.9);
+            border: 2px solid #8f75d9;
+            border-radius: 24px;
+            padding: 12px 8px 10px;
+            backdrop-filter: blur(8px);
+            cursor: pointer;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.7);
+            text-align: center;
+            transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+            position: relative;
+        }
+        .character-card.selected {
+            border-color: #ffb3ff;
+            box-shadow: 0 0 30px #f0f, 0 0 60px #ff69b4;
+            animation: pulseGlow 1s infinite alternate;
+        }
+        @keyframes pulseGlow {
+            from { box-shadow: 0 0 20px #f0f, 0 0 40px #ff69b4; }
+            to { box-shadow: 0 0 40px #f0f, 0 0 80px #ff69b4; }
+        }
+        .character-card.dragging {
+            opacity: 0.8;
+            transform: scale(1.05);
+            box-shadow: 0 20px 40px #a020f0;
+            z-index: 100;
+            transition: none;
+        }
+        .card-avatar {
+            width: 100%; aspect-ratio: 3/4;
+            border-radius: 18px; overflow: hidden;
+            border: 2px solid #c3a6ff; margin-bottom: 8px;
+            background: #2e1d52;
+        }
+        .card-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .card-name { font-size: 18px; font-weight: 600; color: #ede2ff; }
+        .card-status {
+            font-size: 12px;
+            background: #5f3ea0;
+            border-radius: 20px;
+            padding: 2px 6px;
+            color: #d9b0ff;
+            margin-top: 4px;
+        }
+        .like-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            margin-top: 8px;
+            font-size: 16px;
+            color: #ffb3d9;
+        }
+        .like-btn { cursor: pointer; transition: transform 0.2s; }
+        .like-btn:active { transform: scale(1.2); }
+        .like-count { font-size: 14px; }
+
+        /* 待审核标记 */
+        .pending-badge {
+            position: absolute;
+            top: -8px; right: -8px;
+            background: #ffaa00;
+            color: black;
+            border-radius: 50%;
+            width: 30px; height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            border: 2px solid white;
+        }
+
+        /* 画布 (用于关系线) */
+        #lineCanvas {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        /* 关系标签 */
+        .relation-tag {
+            position: absolute;
+            width: 40px; height: 40px;
+            background: #5f3ea0;
+            border: 2px solid #d9b0ff;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: auto;
+            z-index: 20;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; color: white;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+            box-shadow: 0 0 20px #b476ff;
+        }
+        .relation-tag:active { transform: translate(-50%, -50%) scale(1.2); background: #9069f0; }
+
+        /* 底部抽屉 */
+        .drawer-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            display: none;
+        }
+        .drawer {
+            position: fixed; bottom: 0; left: 0;
+            width: 100%;
+            background: rgba(18,8,45,0.98);
+            backdrop-filter: blur(20px);
+            border-top: 3px solid #ac91f0;
+            border-radius: 40px 40px 0 0;
+            padding: 30px 24px;
+            transform: translateY(100%);
+            transition: transform 0.4s cubic-bezier(0.2,0.9,0.3,1);
+            z-index: 1001;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .drawer.active { transform: translateY(0); }
+        .close-drawer {
+            position: absolute; top: 20px; right: 24px;
+            font-size: 28px; color: #cfb2ff;
+            cursor: pointer; background: rgba(0,0,0,0.3);
+            border-radius: 50%; width: 44px; height: 44px;
+            display: flex; align-items: center; justify-content: center;
+            border: 1px solid #a488e0;
+        }
+
+        /* 模态框 (统一高z-index) */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(5,0,20,0.95);
+            backdrop-filter: blur(12px);
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            padding: 16px;
+        }
+        .modal-card {
+            width: 100%; max-width: 500px;
+            background: #13082b;
+            border: 3px solid #ad84f0;
+            border-radius: 60px;
+            padding: 30px 24px;
+            max-height: 90vh; overflow-y: auto;
+            animation: modalPop 0.3s ease;
+        }
+        @keyframes modalPop {
+            0% { opacity: 0; transform: scale(0.9); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .modal-card h3 {
+            font-size: 34px; font-family: 'Cinzel';
+            text-align: center;
+            background: linear-gradient(135deg,#e3c9ff,#ad8aff);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+        }
+        .modal-field { margin-bottom: 18px; }
+        .modal-field label { display: block; font-size: 20px; color: #cdb5ff; margin-bottom: 4px; }
+        .modal-field input, .modal-field textarea {
+            width: 100%; background: #221740;
+            border: 2px solid #7b5ec9; border-radius: 40px;
+            padding: 10px 18px; font-size: 18px; color: #f0e5ff;
+            font-family: inherit;
+        }
+        .avatar-upload { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+        .upload-preview {
+            width: 90px; height: 120px;
+            border-radius: 30px; border: 2px dashed #b797ff;
+            overflow: hidden; background: #1b0e35;
+        }
+        .upload-preview img { width: 100%; height: 100%; object-fit: cover; }
+        .modal-actions { display: flex; gap: 18px; margin-top: 30px; justify-content: flex-end; flex-wrap: wrap; }
+        .modal-btn {
+            background: #3b2470; padding: 12px 24px;
+            border-radius: 50px; color: white; font-size: 22px;
+            cursor: pointer; border: 1px solid #bba2ff;
+            transition: background 0.2s, transform 0.1s;
+            text-align: center; flex: 1 1 auto;
+        }
+        .modal-btn:active { background: #6441b5; transform: scale(0.96); }
+
+        /* 关系网界面 (无特效，清晰布局) */
+        .fullscreen-net {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(8, 2, 20, 0.98);
+            backdrop-filter: blur(10px);
+            z-index: 3000;
+            padding: 0;
+            overflow: hidden;
+            transform: translateY(100%);
+            transition: transform 0.5s cubic-bezier(0.2,0.9,0.3,1);
+        }
+        .fullscreen-net.active { transform: translateY(0); }
+        .net-close {
+            position: absolute;
+            top: 20px; right: 20px;
+            font-size: 40px;
+            color: #d9b0ff;
+            cursor: pointer;
+            z-index: 3010;
+        }
+        .net-tabs {
+            position: absolute;
+            top: 60px; left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            z-index: 3010;
+        }
+        .net-tab {
+            background: #2d1b4b;
+            border: 2px solid #7b5ec9;
+            border-radius: 30px;
+            padding: 8px 20px;
+            color: #bcaaf0;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        .net-tab.active {
+            background: #4a2c8a;
+            color: white;
+            border-color: #d9b0ff;
+        }
+        #netCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+            /* 提高清晰度 */
+            image-rendering: crisp-edges;
+        }
+        .net-popup {
+            position: absolute;
+            background: rgba(18,8,45,0.95);
+            border: 3px solid #ad84f0;
+            border-radius: 30px;
+            padding: 15px;
+            color: white;
+            min-width: 200px;
+            z-index: 3020;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 50px #b476ff;
+            animation: popupAppear 0.2s;
+        }
+        @keyframes popupAppear {
+            0% { opacity: 0; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .net-popup .close-popup {
+            position: absolute;
+            top: 5px; right: 10px;
+            font-size: 24px;
+            color: #ffb3d9;
+            cursor: pointer;
+        }
+
+        /* 评论区域 */
+        .comments-section {
+            margin-top: 20px;
+            border-top: 1px solid #6e54b0;
+            padding-top: 15px;
+        }
+        .comments-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .comments-header h3 { font-size: 22px; color: #d8cafb; }
+        .comments-toggle { font-size: 24px; color: #bcaaf0; cursor: pointer; }
+        .comments-search {
+            width: 100%; background: #221740; border: 2px solid #7b5ec9;
+            border-radius: 40px; padding: 8px 15px; font-size: 18px; color: white; margin-bottom: 10px;
+        }
+        .comments-list {
+            max-height: 200px; overflow-y: auto; margin-bottom: 10px;
+            background: rgba(0,0,0,0.2); border-radius: 20px; padding: 5px;
+        }
+        .comment-item {
+            background: #1f1242; border-radius: 20px; padding: 8px 12px; margin-bottom: 5px;
+            font-size: 18px; position: relative;
+        }
+        .comment-author { color: #b59eff; font-weight: bold; margin-right: 8px; }
+        .comment-time { font-size: 14px; color: #7b5ec9; float: right; }
+        .comment-content { word-break: break-word; }
+        .comment-reply {
+            margin-left: 20px; border-left: 2px solid #6e54b0; padding-left: 10px; margin-top: 5px; font-size: 16px;
+        }
+        .add-comment {
+            display: flex; gap: 10px; margin-top: 10px;
+        }
+        .add-comment input {
+            flex: 1; background: #221740; border: 2px solid #7b5ec9; border-radius: 40px;
+            padding: 8px 15px; font-size: 18px; color: white;
+        }
+        .add-comment button {
+            background: #3b2470; border: 2px solid #bba2ff; border-radius: 40px;
+            padding: 8px 15px; color: white; font-size: 18px; cursor: pointer;
+        }
+
+        /* 读者提交按钮 */
+        .reader-submit-btn {
+            position: fixed;
+            bottom: 20px; right: 20px;
+            width: 60px; height: 60px;
+            background: #4a2c8a;
+            border: 3px solid #d9b0ff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            color: white;
+            box-shadow: 0 0 30px #b476ff;
+            cursor: pointer;
+            z-index: 500;
+            transition: transform 0.2s;
+        }
+        .reader-submit-btn:active { transform: scale(1.1); }
+
+        .hint { color: #b59eff; font-size: 18px; text-align: center; margin: 8px 0; }
+        .sigil { font-size: 14px; color: #5a44a0; text-align: right; margin-top: 8px; letter-spacing: 3px; }
+
+        /* 星区界面 */
+        .starzone-container {
+            position: absolute;
+            top: 120px;
+            left: 0;
+            width: 100%;
+            height: calc(100% - 120px);
+            overflow-y: auto;
+            padding: 20px;
+        }
+        .sort-bar {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+        .sort-btn {
+            background: #2d1b4b;
+            border: 2px solid #7b5ec9;
+            border-radius: 30px;
+            padding: 5px 20px;
+            color: #bcaaf0;
+            cursor: pointer;
+        }
+        .sort-btn.active {
+            background: #4a2c8a;
+            color: white;
+            border-color: #d9b0ff;
+        }
+        .search-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .search-input {
+            flex: 1;
+            background: #221740;
+            border: 2px solid #7b5ec9;
+            border-radius: 40px;
+            padding: 10px 15px;
+            color: white;
+        }
+        .search-btn {
+            background: #3b2470;
+            border: 2px solid #bba2ff;
+            border-radius: 40px;
+            padding: 10px 20px;
+            color: white;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .zone-list {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            background: #1f1242;
+            border-radius: 20px;
+            padding: 10px;
+        }
+        .zone-item {
+            padding: 8px;
+            border-bottom: 1px solid #6e54b0;
+            cursor: pointer;
+        }
+        .zone-item:hover { background: #2d1b4b; }
+    </style>
+</head>
+<body>
+    <!-- 登录界面 -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-card">
+            <div class="login-title">浮世录</div>
+            <div class="login-tabs">
+                <div class="login-tab active" id="loginTab">登录</div>
+                <div class="login-tab" id="registerTab">注册</div>
+            </div>
+            <div id="loginForm">
+                <input type="text" class="login-input" id="loginUsername" placeholder="用户名">
+                <input type="password" class="login-input" id="loginPassword" placeholder="密码">
+                <div class="login-error" id="loginError"></div>
+            </div>
+            <div id="registerForm" style="display:none;">
+                <input type="text" class="login-input" id="regUsername" placeholder="用户名">
+                <input type="password" class="login-input" id="regPassword" placeholder="密码">
+                <input type="password" class="login-input" id="regConfirm" placeholder="确认密码">
+                <div class="login-error" id="registerError"></div>
+            </div>
+            <div class="login-btn" id="loginActionBtn">进入星河</div>
+        </div>
+    </div>
+
+    <!-- 返回按钮 -->
+    <div class="back-btn hidden" id="backBtn"><i class="fas fa-arrow-left"></i></div>
+    <!-- 刷新按钮 -->
+    <div class="refresh-btn hidden" id="refreshBtn"><i class="fas fa-sync-alt"></i></div>
+
+    <!-- 删除区域 -->
+    <div class="delete-zone" id="deleteZone">
+        <i class="fas fa-trash"></i> 拖拽至此删除
+    </div>
+
+    <!-- 主界面容器 -->
+    <div class="app-container hidden" id="appContainer">
+        <div class="left-archive">
+            <div class="title-bar">
+                <div class="icon-btn author-only" id="openWorldviewModalBtn"><i class="fas fa-plus"></i></div>
+                <div class="main-title">浮世录</div>
+                <div class="icon-btn author-only" id="openCharacterModalBtn"><i class="fas fa-plus"></i></div>
+            </div>
+            <div class="main-sub">THE MORTAL COSMOS · 银河人事</div>
+            <div id="welcomeMessage" style="font-size: 18px; color: #d9b0ff; margin-bottom: 10px;"></div>
+
+            <!-- 三入口 -->
+            <div class="entry-row">
+                <div class="entry-item" id="showWorldviewBtn">
+                    <div class="entry-icon"><i class="fas fa-globe"></i></div>
+                    <div class="entry-label">世界观</div>
+                </div>
+                <div class="entry-item" id="showNetBtn">
+                    <div class="entry-icon"><i class="fas fa-star"></i></div>
+                    <div class="entry-label">关系网</div>
+                </div>
+                <div class="entry-item" id="showStarZoneBtn">
+                    <div class="entry-icon"><i class="fas fa-map"></i></div>
+                    <div class="entry-label">星区</div>
+                </div>
+            </div>
+
+            <!-- 主界面热门人设 -->
+            <div style="font-size: 22px; color: #d9b0ff; margin-bottom: 10px;">🔥 热门人设</div>
+            <div id="mainGrid" class="character-grid"></div>
+        </div>
+    </div>
+
+    <!-- 星区界面 (全屏) -->
+    <div class="fullscreen-net" id="starZonePanel" style="background: rgba(8,2,20,0.98); transform: translateY(100%); overflow-y: auto;">
+        <div class="net-close" id="starZoneClose"><i class="fas fa-times"></i></div>
+        <div style="position: absolute; top: 60px; left: 0; width: 100%; text-align: center; color: #d9b0ff; font-size: 32px;">✨ 星区 ✨</div>
+        <div class="starzone-container">
+            <!-- 排序栏 -->
+            <div class="sort-bar">
+                <div class="sort-btn active" data-sort="hot">最热</div>
+                <div class="sort-btn" data-sort="latest">最新</div>
+            </div>
+            <!-- 搜索栏 -->
+            <div class="search-section">
+                <input type="text" class="search-input" id="starZoneSearchInput" placeholder="搜索星区/人设/用户名...">
+                <div class="search-btn" id="starZoneSearchBtn">搜索</div>
+                <div class="search-btn" id="createZoneBtn">+星区</div>
+            </div>
+            <!-- 星区列表 -->
+            <div id="zoneListContainer" class="zone-list"></div>
+            <!-- 人设卡网格 (包含已审核和待审核) -->
+            <div id="starZoneGrid" class="character-grid"></div>
+        </div>
+    </div>
+
+    <!-- 读者提交人设按钮 -->
+    <div class="reader-submit-btn reader-only" id="readerSubmitBtn" style="display:none;"><i class="fas fa-pen"></i></div>
+
+    <!-- 底部抽屉 (详情) -->
+    <div class="drawer-overlay" id="drawerOverlay"></div>
+    <div class="drawer" id="detailDrawer">
+        <div class="close-drawer" id="closeDrawerBtn"><i class="fas fa-times"></i></div>
+        <div class="panel-content" id="drawerContent">加载中...</div>
+    </div>
+
+    <!-- 全屏关系网 (带分区tab) -->
+    <div class="fullscreen-net" id="fullscreenNet">
+        <div class="net-close" id="netClose"><i class="fas fa-times"></i></div>
+        <div class="net-tabs" id="netTabs">
+            <div class="net-tab active" data-zone="main">主星区</div>
+            <div class="net-tab" data-zone="readers">读者星区</div>
+        </div>
+        <canvas id="netCanvas"></canvas>
+    </div>
+
+    <!-- 世界观模态框 -->
+    <div class="modal" id="worldviewModal">
+        <div class="modal-card">
+            <h3>✦ 编辑世界观 ✦</h3>
+            <div class="modal-field"><label>世界之名</label><input type="text" id="worldName"></div>
+            <div class="modal-field"><label>详细叙事</label><textarea id="worldDesc" rows="4"></textarea></div>
+            <div class="modal-actions">
+                <div class="modal-btn" id="saveWorldviewBtn">保存 · 刻印</div>
+                <div class="modal-btn" id="closeWorldviewModalBtn">返回</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 人设模态框 (作者) -->
+    <div class="modal" id="characterModal">
+        <div class="modal-card">
+            <h3 id="charModalTitle">✦ 新·人设 ✦</h3>
+            <div class="modal-field"><label>姓名</label><input type="text" id="charName"></div>
+            <div class="modal-field"><label>年龄</label><input type="text" id="charAge"></div>
+            <div class="modal-field"><label>身份</label><input type="text" id="charRole"></div>
+            <div class="modal-field"><label>喜好</label><input type="text" id="charLikes"></div>
+            <div class="modal-field"><label>缺点</label><input type="text" id="charWeak"></div>
+            <div class="modal-field"><label>背景</label><textarea id="charBio" rows="2"></textarea></div>
+            <div class="modal-field">
+                <label>头像 (3:4)</label>
+                <div class="avatar-upload">
+                    <div class="upload-preview" id="avatarPreview"><img src="" alt="预览"></div>
+                    <input type="file" id="avatarUpload" accept="image/*">
+                </div>
+            </div>
+            <div class="modal-actions">
+                <div class="modal-btn" id="saveCharacterBtn">保存 · 星刻</div>
+                <div class="modal-btn" id="closeCharacterModalBtn">返回</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 读者提交人设模态框 -->
+    <div class="modal" id="readerSubmitModal">
+        <div class="modal-card">
+            <h3>✦ 提交你的人设 ✦</h3>
+            <div class="modal-field"><label>姓名</label><input type="text" id="readerCharName"></div>
+            <div class="modal-field"><label>年龄</label><input type="text" id="readerCharAge"></div>
+            <div class="modal-field"><label>身份</label><input type="text" id="readerCharRole"></div>
+            <div class="modal-field"><label>喜好</label><input type="text" id="readerCharLikes"></div>
+            <div class="modal-field"><label>缺点</label><input type="text" id="readerCharWeak"></div>
+            <div class="modal-field"><label>背景</label><textarea id="readerCharBio" rows="2"></textarea></div>
+            <div class="modal-field">
+                <label>头像 (3:4)</label>
+                <div class="avatar-upload">
+                    <div class="upload-preview" id="readerAvatarPreview"><img src="" alt="预览"></div>
+                    <input type="file" id="readerAvatarUpload" accept="image/*">
+                </div>
+            </div>
+            <div class="modal-field">
+                <label><input type="checkbox" id="requestMainZone"> 申请加入主星区</label>
+            </div>
+            <div class="modal-actions">
+                <div class="modal-btn" id="submitCharacterBtn">提交</div>
+                <div class="modal-btn" id="closeReaderSubmitBtn">取消</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 创建星区模态框 -->
+    <div class="modal" id="createZoneModal">
+        <div class="modal-card">
+            <h3>✦ 创建星区 ✦</h3>
+            <div class="modal-field"><label>星区名称</label><input type="text" id="zoneName"></div>
+            <div class="modal-field"><label>描述</label><textarea id="zoneDesc" rows="3"></textarea></div>
+            <div class="modal-actions">
+                <div class="modal-btn" id="saveZoneBtn">创建</div>
+                <div class="modal-btn" id="cancelZoneBtn">取消</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 邀请加入星区模态框 -->
+    <div class="modal" id="inviteZoneModal">
+        <div class="modal-card">
+            <h3>✦ 邀请加入星区 ✦</h3>
+            <input type="text" class="comments-search" id="inviteSearch" placeholder="搜索人设...">
+            <div id="inviteCharList" style="max-height: 300px; overflow-y: auto;"></div>
+            <div class="modal-actions">
+                <div class="modal-btn" id="closeInviteBtn">取消</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 星区详情模态框 -->
+    <div class="modal" id="zoneDetailModal">
+        <div class="modal-card">
+            <h3 id="zoneDetailTitle"></h3>
+            <p id="zoneDetailDesc"></p>
+            <p id="zoneDetailMemberCount"></p>
+            <div id="zoneDetailMembers" class="character-grid"></div>
+            <div class="modal-actions">
+                <div class="modal-btn" id="inviteToZoneBtn">招募</div>
+                <div class="modal-btn" id="closeZoneDetailBtn">关闭</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 私信模态框 (作者) -->
+    <div class="modal" id="messageModal">
+        <div class="modal-card">
+            <h3>✦ 私信读者 ✦</h3>
+            <div class="modal-field"><label>收件人</label><input type="text" id="messageRecipient" readonly></div>
+            <div class="modal-field"><label>内容</label><textarea id="messageContent" rows="4"></textarea></div>
+            <div class="modal-actions">
+                <div class="modal-btn" id="sendMessageBtn">发送</div>
+                <div class="modal-btn" id="banUserBtn">封禁</div>
+                <div class="modal-btn" id="closeMessageBtn">取消</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 私信通知模态框 (读者收到) -->
+    <div class="modal" id="inboxModal">
+        <div class="modal-card">
+            <h3>✦ 私信 ✦</h3>
+            <div id="inboxContent"></div>
+            <div class="modal-actions">
+                <div class="modal-btn" id="closeInboxBtn">关闭</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 关系编辑模态框 -->
+    <div class="modal" id="relationEditModal">
+        <div class="modal-card">
+            <h3>✦ 编辑关系 ✦</h3>
+            <div id="relationEditBetween" style="font-size:22px; margin-bottom:12px;"></div>
+            <div class="modal-field"><label>正向关系 (A→B)</label><input type="text" id="relationForwardDesc" placeholder="例如: 哥哥"></div>
+            <div class="modal-field"><label>反向关系 (B→A)</label><input type="text" id="relationBackwardDesc" placeholder="例如: 弟弟"></div>
+            <div class="modal-actions">
+                <div class="modal-btn" id="updateRelationBtn">确认</div>
+                <div class="modal-btn" id="cancelRelationEditBtn">取消</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 选择人设关系模态框 -->
+    <div class="modal" id="selectCharModal">
+        <div class="modal-card">
+            <h3>✦ 选择建立关系的人设 ✦</h3>
+            <input type="text" class="comments-search" id="searchCharInput" placeholder="搜索名字...">
+            <div id="charList" style="max-height: 300px; overflow-y: auto;"></div>
+            <div class="modal-actions">
+                <div class="modal-btn" id="cancelSelectCharBtn">取消</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 请求模态框 (关系/邀请) -->
+    <div class="modal" id="requestModal">
+        <div class="modal-card">
+            <h3>✦ 请求 ✦</h3>
+            <div id="requestContent"></div>
+            <div class="modal-actions">
+                <div class="modal-btn" id="acceptRequestBtn">同意</div>
+                <div class="modal-btn" id="rejectRequestBtn">拒绝</div>
+                <div class="modal-btn" id="closeRequestBtn">关闭</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 审核模态框 (作者审核读者提交) -->
+    <div class="modal" id="reviewModal">
+        <div class="modal-card">
+            <h3>✦ 审核人设 ✦</h3>
+            <div id="reviewContent"></div>
+            <div class="modal-field" id="rejectReasonField" style="display:none;">
+                <label>驳回原因</label><input type="text" id="rejectReason">
+            </div>
+            <div class="modal-actions">
+                <div class="modal-btn" id="approveBtn">通过</div>
+                <div class="modal-btn" id="rejectBtn">驳回</div>
+                <div class="modal-btn" id="cancelReviewBtn">取消</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 评论回复模态框 -->
+    <div class="modal" id="replyModal">
+        <div class="modal-card">
+            <h3>✦ 回复评论 ✦</h3>
+            <div class="modal-field"><label>回复内容</label><input type="text" id="replyContent"></div>
+            <div class="modal-actions">
+                <div class="modal-btn" id="saveReplyBtn">回复</div>
+                <div class="modal-btn" id="cancelReplyBtn">取消</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // ---------- 数据结构 ----------
+            let characters = [];          // 所有已通过审核的人设 { id, name, age, role, likes, weaknesses, bio, avatar, owner, isAuthor, status, requestMain, createdAt, likes: [], zoneId? }
+            let pendingCharacters = [];    // 待审核人设 (读者提交)
+            let worldview = { name: '星尘纪', desc: '众生漂浮于紫雾银河，诸神沉睡，只有记录者清醒。' };
+            let relations = [];            // 已建立的关系 { id, fromId, toId, forwardDesc, backwardDesc }
+            let users = [];                // 用户 { username, password, title?, banned? }
+            let comments = [];              // 评论 { id, ocId, username, content, time, replyTo }
+            let relationRequests = [];      // 关系请求 { id, fromId, toId, fromDesc, toDesc, status: 'pending' }
+            let zones = [];                 // 星区 { id, name, desc, owner, status: 'approved'/'pending', members: [charId], createdAt }
+            let zoneInvitations = [];        // 星区邀请 { id, zoneId, charId, fromUser, toUser, status: 'pending' }
+            let messages = [];               // 私信 { id, from, to, content, time, read? }
+            let bannedUsers = [];            // 被封禁用户名列表
+
+            let currentUser = null;         // 当前登录用户 { username, title? }
+            let isAuthor = false;            // 是否为作者
+            let editingCharId = null;        // 正在编辑的人设id
+
+            // 选中状态用于拖拽删除
+            let selectedCardId = null;
+            let longPressTimer = null;
+            const LONG_PRESS_DELAY = 500;
+            let isDragging = false;
+            let dragCard = null;
+            let dragClone = null;
+            let dragStartY = 0;
+            const deleteZone = document.getElementById('deleteZone');
+
+            // 当前查看的人设ID
+            let currentOcId = null;
+            let currentReplyCommentId = null;
+            let currentReviewId = null;
+            let currentRequestId = null;      // 当前处理的请求ID
+            let currentZoneId = null;          // 当前查看的星区ID
+
+            // 关系网当前显示的区
+            let currentNetZone = 'main';
+
+            // 待建立关系的源ID
+            let pendingRelationFromId = null;
+
+            // 星区排序模式
+            let starZoneSort = 'hot'; // 'hot' 或 'latest'
+            let starZoneSearchQuery = '';
+
+            // 称号词库
+            const titlePrefixes = [
+                "观星者", "揽月客", "织梦师", "逐光人", "听风使",
+                "踏云客", "寻迹者", "守夜人", "绘星师", "裁梦者",
+                "饮露客", "御风使", "揽辰君", "渡云者", "摘星人"
+            ];
+
+            // DOM 元素
+            const $ = id => document.getElementById(id);
+            const loginScreen = $('loginScreen');
+            const appContainer = $('appContainer');
+            const backBtn = $('backBtn');
+            const refreshBtn = $('refreshBtn');
+            const loginTab = $('loginTab');
+            const registerTab = $('registerTab');
+            const loginForm = $('loginForm');
+            const registerForm = $('registerForm');
+            const loginUsername = $('loginUsername');
+            const loginPassword = $('loginPassword');
+            const regUsername = $('regUsername');
+            const regPassword = $('regPassword');
+            const regConfirm = $('regConfirm');
+            const loginError = $('loginError');
+            const registerError = $('registerError');
+            const loginActionBtn = $('loginActionBtn');
+            const authorOnlyBtns = document.querySelectorAll('.author-only');
+            const readerOnlyBtns = document.querySelectorAll('.reader-only');
+            const mainGrid = $('mainGrid');
+            const starZonePanel = $('starZonePanel');
+            const starZoneClose = $('starZoneClose');
+            const starZoneGrid = $('starZoneGrid');
+            const zoneListContainer = $('zoneListContainer');
+            const drawer = $('detailDrawer');
+            const drawerOverlay = $('drawerOverlay');
+            const drawerContent = $('drawerContent');
+            const closeDrawerBtn = $('closeDrawerBtn');
+            const wvModal = $('worldviewModal');
+            const charModal = $('characterModal');
+            const relationEditModal = $('relationEditModal');
+            const replyModal = $('replyModal');
+            const readerSubmitModal = $('readerSubmitModal');
+            const selectCharModal = $('selectCharModal');
+            const requestModal = $('requestModal');
+            const createZoneModal = $('createZoneModal');
+            const inviteZoneModal = $('inviteZoneModal');
+            const zoneDetailModal = $('zoneDetailModal');
+            const messageModal = $('messageModal');
+            const inboxModal = $('inboxModal');
+            const openWorldviewBtn = $('openWorldviewModalBtn');
+            const openCharBtn = $('openCharacterModalBtn');
+            const closeWorldviewBtn = $('closeWorldviewModalBtn');
+            const closeCharBtn = $('closeCharacterModalBtn');
+            const saveWorldview = $('saveWorldviewBtn');
+            const saveCharacter = $('saveCharacterBtn');
+            const showWorldviewBtn = $('showWorldviewBtn');
+            const showNetBtn = $('showNetBtn');
+            const showStarZoneBtn = $('showStarZoneBtn');
+            const fullscreenNet = $('fullscreenNet');
+            const netClose = $('netClose');
+            const netCanvas = $('netCanvas');
+            const netTabs = document.querySelectorAll('.net-tab');
+            const updateRelationBtn = $('updateRelationBtn');
+            const cancelRelationEditBtn = $('cancelRelationEditBtn');
+            const relationEditBetween = $('relationEditBetween');
+            const relationForwardDesc = $('relationForwardDesc');
+            const relationBackwardDesc = $('relationBackwardDesc');
+            const replyContent = $('replyContent');
+            const saveReplyBtn = $('saveReplyBtn');
+            const cancelReplyBtn = $('cancelReplyBtn');
+            const readerSubmitBtn = $('readerSubmitBtn');
+            const readerCharName = $('readerCharName');
+            const readerCharAge = $('readerCharAge');
+            const readerCharRole = $('readerCharRole');
+            const readerCharLikes = $('readerCharLikes');
+            const readerCharWeak = $('readerCharWeak');
+            const readerCharBio = $('readerCharBio');
+            const readerAvatarUpload = $('readerAvatarUpload');
+            const readerAvatarPreview = document.querySelector('#readerAvatarPreview img');
+            const requestMainZone = $('requestMainZone');
+            const submitCharacterBtn = $('submitCharacterBtn');
+            const closeReaderSubmitBtn = $('closeReaderSubmitBtn');
+            const searchCharInput = $('searchCharInput');
+            const charList = $('charList');
+            const cancelSelectCharBtn = $('cancelSelectCharBtn');
+            const requestContent = $('requestContent');
+            const acceptRequestBtn = $('acceptRequestBtn');
+            const rejectRequestBtn = $('rejectRequestBtn');
+            const closeRequestBtn = $('closeRequestBtn');
+            const zoneSearchInput = $('starZoneSearchInput');
+            const zoneSearchBtn = $('starZoneSearchBtn');
+            const createZoneBtn = $('createZoneBtn');
+            const zoneName = $('zoneName');
+            const zoneDesc = $('zoneDesc');
+            const saveZoneBtn = $('saveZoneBtn');
+            const cancelZoneBtn = $('cancelZoneBtn');
+            const inviteSearch = $('inviteSearch');
+            const inviteCharList = $('inviteCharList');
+            const closeInviteBtn = $('closeInviteBtn');
+            const zoneDetailTitle = $('zoneDetailTitle');
+            const zoneDetailDesc = $('zoneDetailDesc');
+            const zoneDetailMemberCount = $('zoneDetailMemberCount');
+            const zoneDetailMembers = $('zoneDetailMembers');
+            const inviteToZoneBtn = $('inviteToZoneBtn');
+            const closeZoneDetailBtn = $('closeZoneDetailBtn');
+            const messageRecipient = $('messageRecipient');
+            const messageContent = $('messageContent');
+            const sendMessageBtn = $('sendMessageBtn');
+            const banUserBtn = $('banUserBtn');
+            const closeMessageBtn = $('closeMessageBtn');
+            const inboxContent = $('inboxContent');
+            const closeInboxBtn = $('closeInboxBtn');
+            const welcomeMessage = $('welcomeMessage');
+            const sortBtns = document.querySelectorAll('.sort-btn');
+
+            // 输入字段
+            const worldNameInp = $('worldName');
+            const worldDescInp = $('worldDesc');
+            const charNameInp = $('charName');
+            const charAgeInp = $('charAge');
+            const charRoleInp = $('charRole');
+            const charLikesInp = $('charLikes');
+            const charWeakInp = $('charWeak');
+            const charBioInp = $('charBio');
+            const avatarUpload = $('avatarUpload');
+            const avatarPreviewImg = document.querySelector('#avatarPreview img');
+            const charModalTitle = $('charModalTitle');
+
+            // ---------- 本地存储 ----------
+            function loadFromStorage() {
+                try {
+                    const savedChars = localStorage.getItem('fushilu_characters_v19');
+                    if (savedChars) characters = JSON.parse(savedChars);
+                    const savedPending = localStorage.getItem('fushilu_pending');
+                    if (savedPending) pendingCharacters = JSON.parse(savedPending);
+                    const savedWV = localStorage.getItem('fushilu_worldview');
+                    if (savedWV) worldview = JSON.parse(savedWV);
+                    const savedRels = localStorage.getItem('fushilu_relations_v16');
+                    if (savedRels) relations = JSON.parse(savedRels);
+                    const savedUsers = localStorage.getItem('fushilu_users');
+                    if (savedUsers) users = JSON.parse(savedUsers);
+                    const savedComments = localStorage.getItem('fushilu_comments');
+                    if (savedComments) comments = JSON.parse(savedComments);
+                    const savedReqs = localStorage.getItem('fushilu_requests');
+                    if (savedReqs) relationRequests = JSON.parse(savedReqs);
+                    const savedZones = localStorage.getItem('fushilu_zones');
+                    if (savedZones) zones = JSON.parse(savedZones);
+                    const savedInvites = localStorage.getItem('fushilu_zoneInvites');
+                    if (savedInvites) zoneInvitations = JSON.parse(savedInvites);
+                    const savedMessages = localStorage.getItem('fushilu_messages');
+                    if (savedMessages) messages = JSON.parse(savedMessages);
+                    const savedBanned = localStorage.getItem('fushilu_banned');
+                    if (savedBanned) bannedUsers = JSON.parse(savedBanned);
+                } catch (e) { console.warn('读取失败', e); }
+            }
+            function saveToStorage() {
+                try {
+                    localStorage.setItem('fushilu_characters_v19', JSON.stringify(characters));
+                    localStorage.setItem('fushilu_pending', JSON.stringify(pendingCharacters));
+                    localStorage.setItem('fushilu_worldview', JSON.stringify(worldview));
+                    localStorage.setItem('fushilu_relations_v16', JSON.stringify(relations));
+                    localStorage.setItem('fushilu_users', JSON.stringify(users));
+                    localStorage.setItem('fushilu_comments', JSON.stringify(comments));
+                    localStorage.setItem('fushilu_requests', JSON.stringify(relationRequests));
+                    localStorage.setItem('fushilu_zones', JSON.stringify(zones));
+                    localStorage.setItem('fushilu_zoneInvites', JSON.stringify(zoneInvitations));
+                    localStorage.setItem('fushilu_messages', JSON.stringify(messages));
+                    localStorage.setItem('fushilu_banned', JSON.stringify(bannedUsers));
+                } catch (e) { console.warn('存储失败', e); }
+            }
+
+            // ---------- 登录注册 ----------
+            let currentMode = 'login';
+            loginTab.addEventListener('click', () => {
+                loginTab.classList.add('active');
+                registerTab.classList.remove('active');
+                loginForm.style.display = 'block';
+                registerForm.style.display = 'none';
+                currentMode = 'login';
+                loginError.innerText = '';
+                registerError.innerText = '';
+            });
+            registerTab.addEventListener('click', () => {
+                registerTab.classList.add('active');
+                loginTab.classList.remove('active');
+                loginForm.style.display = 'none';
+                registerForm.style.display = 'block';
+                currentMode = 'register';
+                loginError.innerText = '';
+                registerError.innerText = '';
+            });
+
+            function showNotification(text, callback) {
+                const notif = document.createElement('div');
+                notif.className = 'notification';
+                notif.innerHTML = `
+                    <div class="close-notif" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></div>
+                    <p>${text}</p>
+                `;
+                document.body.appendChild(notif);
+                if (callback) notif.addEventListener('click', callback);
+                setTimeout(() => notif.remove(), 5000);
+            }
+
+            // 生成随机称号
+            function generateTitle(username) {
+                const prefix = titlePrefixes[Math.floor(Math.random() * titlePrefixes.length)];
+                return `${prefix} ${username}`;
+            }
+
+            loginActionBtn.addEventListener('click', () => {
+                if (currentMode === 'login') {
+                    const username = loginUsername.value.trim();
+                    const password = loginPassword.value.trim();
+
+                    // 检查封禁
+                    if (bannedUsers.includes(username)) {
+                        loginError.innerText = '您已被封禁，无法登录';
+                        return;
+                    }
+
+                    if (username === 'DRB鸟' && password === 'LiuLu0224') {
+                        currentUser = { username, title: '创世者' };
+                        isAuthor = true;
+                        loginScreen.style.opacity = '0';
+                        setTimeout(() => {
+                            loginScreen.style.display = 'none';
+                            appContainer.classList.remove('hidden');
+                            backBtn.classList.remove('hidden');
+                            refreshBtn.classList.remove('hidden');
+                            authorOnlyBtns.forEach(btn => btn.style.display = 'flex');
+                            readerOnlyBtns.forEach(btn => btn.style.display = 'none');
+                            welcomeMessage.innerText = `欢迎您，创世者 ${username}`;
+                            loadFromStorage();
+                            renderMainGrid();
+                            checkAllNotifications();
+                        }, 500);
+                        return;
+                    }
+
+                    const user = users.find(u => u.username === username);
+                    if (!user) {
+                        loginError.innerText = '用户不存在，请先注册';
+                        return;
+                    }
+                    if (user.password !== password) {
+                        loginError.innerText = '密码错误';
+                        return;
+                    }
+                    // 读者登录
+                    currentUser = { username, title: user.title || generateTitle(username) };
+                    // 保存称号
+                    user.title = currentUser.title;
+                    saveToStorage();
+                    isAuthor = false;
+                    loginScreen.style.opacity = '0';
+                    setTimeout(() => {
+                        loginScreen.style.display = 'none';
+                        appContainer.classList.remove('hidden');
+                        backBtn.classList.remove('hidden');
+                        refreshBtn.classList.remove('hidden');
+                        authorOnlyBtns.forEach(btn => btn.style.display = 'none');
+                        readerOnlyBtns.forEach(btn => btn.style.display = 'flex');
+                        welcomeMessage.innerText = `欢迎您，${currentUser.title}`;
+                        loadFromStorage();
+                        renderMainGrid();
+                        checkAllNotifications();
+                    }, 500);
+                } else {
+                    // 注册
+                    const username = regUsername.value.trim();
+                    const password = regPassword.value.trim();
+                    const confirm = regConfirm.value.trim();
+                    if (!username || !password) {
+                        registerError.innerText = '用户名和密码不能为空';
+                        return;
+                    }
+                    if (password !== confirm) {
+                        registerError.innerText = '两次密码不一致';
+                        return;
+                    }
+                    if (users.find(u => u.username === username)) {
+                        registerError.innerText = '用户名已存在';
+                        return;
+                    }
+                    const title = generateTitle(username);
+                    users.push({ username, password, title });
+                    saveToStorage();
+                    loginTab.click();
+                    loginUsername.value = username;
+                    loginPassword.value = '';
+                    loginError.innerText = '注册成功，请登录';
+                }
+            });
+
+            function checkAllNotifications() {
+                // 检查待审核人设
+                if (isAuthor && pendingCharacters.length > 0) {
+                    showNotification('您有待审核人设卡', () => {
+                        starZonePanel.style.transform = 'translateY(0)';
+                        starZonePanel.classList.add('active');
+                        renderStarZone();
+                    });
+                }
+                // 检查关系请求
+                const myRelReqs = relationRequests.filter(r => {
+                    const toChar = characters.find(c => c.id == r.toId);
+                    return toChar && toChar.owner === currentUser.username && r.status === 'pending';
+                });
+                if (myRelReqs.length > 0) {
+                    const req = myRelReqs[0];
+                    const fromChar = characters.find(c => c.id == req.fromId);
+                    showNotification(`${fromChar?.name} 想与您的人设建立关系`, () => {
+                        showRequest(req.id);
+                    });
+                }
+                // 检查星区邀请
+                const myZoneInvites = zoneInvitations.filter(inv => {
+                    const char = characters.find(c => c.id == inv.charId);
+                    return char && char.owner === currentUser.username && inv.status === 'pending';
+                });
+                if (myZoneInvites.length > 0) {
+                    const inv = myZoneInvites[0];
+                    const zone = zones.find(z => z.id == inv.zoneId);
+                    showNotification(`您被邀请加入星区「${zone?.name}」`, () => {
+                        showZoneInvite(inv.id);
+                    });
+                }
+                // 检查私信
+                const unreadMessages = messages.filter(m => m.to === currentUser.username && !m.read);
+                if (unreadMessages.length > 0) {
+                    showInbox();
+                }
+            }
+
+            function showRequest(reqId) {
+                const req = relationRequests.find(r => r.id == reqId);
+                if (!req) return;
+                const fromChar = characters.find(c => c.id == req.fromId);
+                const toChar = characters.find(c => c.id == req.toId);
+                requestContent.innerHTML = `
+                    <p><strong>${fromChar?.name}</strong> (创作者: ${fromChar?.owner}) 想与 <strong>${toChar?.name}</strong> (创作者: ${toChar?.owner}) 建立关系</p>
+                    <p>正向关系: ${req.fromDesc || '无'}</p>
+                    <p>反向关系: ${req.toDesc || '无'}</p>
+                    <div class="character-card" style="width:100%; margin-top:10px;" onclick="showCharacterDetail('${fromChar?.id}')">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <div style="width:50px; height:66px; border-radius:10px; overflow:hidden;"><img src="${fromChar?.avatar || '...'}" style="width:100%;height:100%;object-fit:cover;"></div>
+                            <div>点击查看 ${fromChar?.name}</div>
+                        </div>
+                    </div>
+                `;
+                currentRequestId = reqId;
+                requestModal.style.display = 'flex';
+            }
+
+            acceptRequestBtn.addEventListener('click', () => {
+                if (!currentRequestId) return;
+                const req = relationRequests.find(r => r.id == currentRequestId);
+                if (req) {
+                    const newRel = {
+                        id: Date.now() + Math.random(),
+                        fromId: req.fromId,
+                        toId: req.toId,
+                        forwardDesc: req.fromDesc,
+                        backwardDesc: req.toDesc
+                    };
+                    relations.push(newRel);
+                    req.status = 'accepted';
+                    saveToStorage();
+                }
+                requestModal.style.display = 'none';
+                currentRequestId = null;
+            });
+
+            rejectRequestBtn.addEventListener('click', () => {
+                if (currentRequestId) {
+                    const req = relationRequests.find(r => r.id == currentRequestId);
+                    if (req) req.status = 'rejected';
+                    saveToStorage();
+                }
+                requestModal.style.display = 'none';
+                currentRequestId = null;
+            });
+
+            closeRequestBtn.addEventListener('click', () => {
+                requestModal.style.display = 'none';
+                currentRequestId = null;
+            });
+
+            // 显示星区邀请
+            function showZoneInvite(invId) {
+                const inv = zoneInvitations.find(i => i.id == invId);
+                if (!inv) return;
+                const zone = zones.find(z => z.id == inv.zoneId);
+                const char = characters.find(c => c.id == inv.charId);
+                requestContent.innerHTML = `
+                    <p><strong>${zone?.name}</strong> 邀请 <strong>${char?.name}</strong> 加入该星区</p>
+                    <p>星区描述: ${zone?.desc || '无'}</p>
+                `;
+                currentRequestId = invId;
+                requestModal.style.display = 'flex';
+                // 修改按钮行为
+                acceptRequestBtn.onclick = () => {
+                    inv.status = 'accepted';
+                    if (char) {
+                        char.zoneId = zone.id;
+                        // 如果zone有members，添加
+                        if (!zone.members) zone.members = [];
+                        if (!zone.members.includes(char.id)) zone.members.push(char.id);
+                    }
+                    saveToStorage();
+                    requestModal.style.display = 'none';
+                };
+                rejectRequestBtn.onclick = () => {
+                    inv.status = 'rejected';
+                    saveToStorage();
+                    requestModal.style.display = 'none';
+                };
+            }
+
+            // 显示私信列表
+            function showInbox() {
+                const unread = messages.filter(m => m.to === currentUser.username && !m.read);
+                let html = '';
+                unread.forEach(msg => {
+                    html += `<div style="border-bottom:1px solid #6e54b0; padding:10px;">
+                        <p><strong>来自 ${msg.from}:</strong> ${msg.content}</p>
+                        <small>${new Date(msg.time).toLocaleString()}</small>
+                    </div>`;
+                    msg.read = true;
+                });
+                saveToStorage();
+                inboxContent.innerHTML = html || '<p>暂无新私信</p>';
+                inboxModal.style.display = 'flex';
+            }
+
+            closeInboxBtn.addEventListener('click', () => {
+                inboxModal.style.display = 'none';
+            });
+
+            // 刷新按钮
+            refreshBtn.addEventListener('click', () => {
+                loadFromStorage();
+                renderMainGrid();
+                if (starZonePanel.classList.contains('active')) renderStarZone();
+                checkAllNotifications();
+                showNotification('数据已刷新');
+            });
+
+            // 返回按钮
+            backBtn.addEventListener('click', () => {
+                if (fullscreenNet.classList.contains('active')) {
+                    fullscreenNet.classList.remove('active');
+                } else if (starZonePanel.classList.contains('active')) {
+                    starZonePanel.classList.remove('active');
+                    starZonePanel.style.transform = 'translateY(100%)';
+                } else if (drawer.classList.contains('active')) {
+                    drawer.classList.remove('active');
+                    drawerOverlay.style.display = 'none';
+                } else {
+                    loginScreen.style.display = 'flex';
+                    loginScreen.style.opacity = '1';
+                    appContainer.classList.add('hidden');
+                    backBtn.classList.add('hidden');
+                    refreshBtn.classList.add('hidden');
+                    currentUser = null;
+                    isAuthor = false;
+                }
+            });
+
+            // ---------- 渲染主界面 (热门人设) ----------
+            function renderMainGrid() {
+                const sorted = [...characters].sort((a, b) => (b.likes?.length || 0) - (a.likes?.length || 0));
+                const hot = sorted.slice(0, 4);
+                if (hot.length === 0) {
+                    mainGrid.innerHTML = '<div class="empty-tip">暂无热门人设</div>';
+                    return;
+                }
+                let html = '';
+                hot.forEach(c => {
+                    const avatarSrc = c.avatar || 'data:image/svg+xml...';
+                    const likeCount = c.likes?.length || 0;
+                    const userLiked = currentUser && c.likes?.includes(currentUser.username);
+                    html += `<div class="character-card" data-id="${c.id}" data-owner="${c.owner}">
+                        <div class="card-avatar"><img src="${avatarSrc}" alt="头像"></div>
+                        <div class="card-name">${c.name}</div>
+                        <div class="like-section">
+                            <span class="like-btn" onclick="toggleLike('${c.id}')"><i class="fas fa-hand-paper" style="color:${userLiked ? '#ffb3d9' : '#aaa'};"></i></span>
+                            <span class="like-count">${likeCount}</span>
+                        </div>
+                    </div>`;
+                });
+                mainGrid.innerHTML = html;
+                document.querySelectorAll('#mainGrid .character-card').forEach(card => {
+                    card.addEventListener('click', (e) => {
+                        if (e.target.closest('.like-btn')) return;
+                        const id = card.dataset.id;
+                        showCharacterDetail(id);
+                    });
+                });
+            }
+
+            // 点赞
+            window.toggleLike = (charId) => {
+                if (!currentUser) return;
+                const char = characters.find(c => c.id == charId);
+                if (!char) return;
+                if (!char.likes) char.likes = [];
+                const idx = char.likes.indexOf(currentUser.username);
+                if (idx === -1) char.likes.push(currentUser.username);
+                else char.likes.splice(idx, 1);
+                saveToStorage();
+                if (starZonePanel.classList.contains('active')) renderStarZone();
+                else renderMainGrid();
+            };
+
+            // ---------- 星区相关 ----------
+            function renderStarZone() {
+                renderZoneList();
+                renderStarZoneGrid();
+                // 绑定长按删除
+                attachDragDeleteToStarZone();
+            }
+
+            function renderZoneList() {
+                const visibleZones = zones.filter(z => z.status === 'approved' || (isAuthor && z.status === 'pending') || z.owner === currentUser.username);
+                let html = '';
+                visibleZones.forEach(z => {
+                    const memberCount = z.members?.length || 0;
+                    html += `<div class="zone-item" data-zone-id="${z.id}">
+                        <strong>${z.name}</strong> (${memberCount}人)
+                        <br><small>${z.desc || '无描述'}</small>
+                    </div>`;
+                });
+                zoneListContainer.innerHTML = html || '<div class="zone-item">暂无星区</div>';
+                document.querySelectorAll('.zone-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        const zoneId = item.dataset.zoneId;
+                        showZoneDetail(zoneId);
+                    });
+                });
+            }
+
+            function renderStarZoneGrid() {
+                // 获取所有已审核人设
+                let approvedChars = characters.filter(c => c.status === 'approved');
+                // 待审核人设
+                let pendingChars = pendingCharacters.filter(p => p.status === 'pending');
+                
+                // 应用搜索过滤
+                if (starZoneSearchQuery) {
+                    approvedChars = approvedChars.filter(c => c.name.toLowerCase().includes(starZoneSearchQuery.toLowerCase()));
+                    pendingChars = pendingChars.filter(p => p.data.name.toLowerCase().includes(starZoneSearchQuery.toLowerCase()));
+                }
+                
+                // 排序（只对已审核排序）
+                if (starZoneSort === 'hot') {
+                    approvedChars.sort((a, b) => (b.likes?.length || 0) - (a.likes?.length || 0));
+                } else {
+                    approvedChars.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+                }
+
+                let html = '';
+                // 先显示已审核
+                approvedChars.forEach(c => {
+                    const avatarSrc = c.avatar || '...';
+                    const likeCount = c.likes?.length || 0;
+                    const userLiked = currentUser && c.likes?.includes(currentUser.username);
+                    html += `<div class="character-card" data-id="${c.id}" data-owner="${c.owner}">
+                        <div class="card-avatar"><img src="${avatarSrc}" alt="头像"></div>
+                        <div class="card-name">${c.name}</div>
+                        ${c.owner !== 'DRB鸟' ? `<div class="card-status">by ${c.owner}</div>` : ''}
+                        <div class="like-section">
+                            <span class="like-btn" onclick="toggleLike('${c.id}')"><i class="fas fa-hand-paper" style="color:${userLiked ? '#ffb3d9' : '#aaa'};"></i></span>
+                            <span class="like-count">${likeCount}</span>
+                        </div>
+                    </div>`;
+                });
+                // 再显示待审核
+                pendingChars.forEach(p => {
+                    const data = p.data;
+                    const avatarSrc = data.avatar || '...';
+                    html += `<div class="character-card pending-card" data-pending-id="${p.id}">
+                        <div class="card-avatar"><img src="${avatarSrc}" alt="头像"></div>
+                        <div class="card-name">${data.name}</div>
+                        <div class="card-status">待审核</div>
+                        <div class="pending-badge">⏳</div>
+                    </div>`;
+                });
+
+                starZoneGrid.innerHTML = html || '<div class="empty-tip">暂无匹配内容</div>';
+
+                // 绑定点击事件：已审核卡片打开详情，待审核卡片打开审核
+                document.querySelectorAll('#starZoneGrid .character-card:not(.pending-card)').forEach(card => {
+                    card.addEventListener('click', (e) => {
+                        if (e.target.closest('.like-btn')) return;
+                        const id = card.dataset.id;
+                        showCharacterDetail(id);
+                    });
+                });
+                document.querySelectorAll('#starZoneGrid .pending-card').forEach(card => {
+                    card.addEventListener('click', () => {
+                        const pendingId = card.dataset.pendingId;
+                        openReviewModal(pendingId);
+                    });
+                });
+            }
+
+            // 星区长按拖拽删除
+            function attachDragDeleteToStarZone() {
+                const cards = document.querySelectorAll('#starZoneGrid .character-card:not(.pending-card)');
+                cards.forEach(card => {
+                    card.addEventListener('touchstart', (e) => {
+                        if (!currentUser) return;
+                        const owner = card.dataset.owner;
+                        const canDelete = isAuthor || owner === currentUser.username;
+                        if (!canDelete) return;
+                        e.preventDefault();
+                        longPressTimer = setTimeout(() => {
+                            document.querySelectorAll('.character-card').forEach(c => c.classList.remove('selected'));
+                            card.classList.add('selected');
+                            selectedCardId = card.dataset.id;
+                            isDragging = true;
+                            dragCard = card;
+                            const rect = card.getBoundingClientRect();
+                            dragStartY = e.touches[0].clientY;
+                            dragClone = card.cloneNode(true);
+                            dragClone.classList.add('dragging');
+                            dragClone.style.position = 'fixed';
+                            dragClone.style.left = rect.left + 'px';
+                            dragClone.style.top = rect.top + 'px';
+                            dragClone.style.width = rect.width + 'px';
+                            dragClone.style.zIndex = '1000';
+                            dragClone.style.pointerEvents = 'none';
+                            document.body.appendChild(dragClone);
+                            card.style.opacity = '0.3';
+                            deleteZone.classList.add('active');
+                        }, LONG_PRESS_DELAY);
+                    });
+                    card.addEventListener('touchmove', (e) => {
+                        if (!isDragging || !dragClone) return;
+                        e.preventDefault();
+                        const touch = e.touches[0];
+                        dragClone.style.top = (touch.clientY - dragClone.offsetHeight/2) + 'px';
+                        dragClone.style.left = (touch.clientX - dragClone.offsetWidth/2) + 'px';
+                    });
+                    card.addEventListener('touchend', (e) => {
+                        clearTimeout(longPressTimer);
+                        if (!isDragging || !dragClone) return;
+                        const touch = e.changedTouches[0];
+                        const deleteZoneRect = deleteZone.getBoundingClientRect();
+                        if (touch.clientY > deleteZoneRect.top) {
+                            if (confirm('确定删除这个人设吗？')) {
+                                characters = characters.filter(c => c.id != selectedCardId);
+                                relations = relations.filter(r => r.fromId != selectedCardId && r.toId != selectedCardId);
+                                // 同时从星区成员中移除
+                                zones.forEach(z => {
+                                    if (z.members) z.members = z.members.filter(id => id != selectedCardId);
+                                });
+                                saveToStorage();
+                                renderStarZone();
+                                renderMainGrid();
+                            }
+                        }
+                        if (dragClone) dragClone.remove();
+                        dragClone = null;
+                        if (dragCard) dragCard.style.opacity = '1';
+                        isDragging = false;
+                        deleteZone.classList.remove('active');
+                        document.querySelectorAll('.character-card').forEach(c => c.classList.remove('selected'));
+                        selectedCardId = null;
+                    });
+                });
+            }
+
+            function showZoneDetail(zoneId) {
+                const zone = zones.find(z => z.id == zoneId);
+                if (!zone) return;
+                currentZoneId = zoneId;
+                zoneDetailTitle.innerText = zone.name;
+                zoneDetailDesc.innerText = zone.desc || '无描述';
+                const members = (zone.members || []).map(id => characters.find(c => c.id == id)).filter(Boolean);
+                zoneDetailMemberCount.innerText = `成员数: ${members.length}`;
+                let membersHtml = '';
+                members.forEach(c => {
+                    membersHtml += `<div class="character-card" style="width:100px;" onclick="showCharacterDetail('${c.id}')">
+                        <div class="card-avatar"><img src="${c.avatar || '...'}"></div>
+                        <div class="card-name">${c.name}</div>
+                    </div>`;
+                });
+                zoneDetailMembers.innerHTML = membersHtml || '<p>暂无成员</p>';
+                zoneDetailModal.style.display = 'flex';
+            }
+
+            // 创建星区
+            createZoneBtn.addEventListener('click', () => {
+                createZoneModal.style.display = 'flex';
+            });
+            cancelZoneBtn.addEventListener('click', () => {
+                createZoneModal.style.display = 'none';
+                zoneName.value = '';
+                zoneDesc.value = '';
+            });
+            saveZoneBtn.addEventListener('click', () => {
+                const name = zoneName.value.trim();
+                const desc = zoneDesc.value.trim();
+                if (!name) return alert('星区名称不能为空');
+                const newZone = {
+                    id: Date.now() + Math.random(),
+                    name,
+                    desc,
+                    owner: currentUser.username,
+                    status: isAuthor ? 'approved' : 'pending',
+                    members: [],
+                    createdAt: Date.now()
+                };
+                zones.push(newZone);
+                saveToStorage();
+                createZoneModal.style.display = 'none';
+                zoneName.value = '';
+                zoneDesc.value = '';
+                if (!isAuthor) {
+                    showNotification('星区已提交审核，请等待作者通过');
+                } else {
+                    renderZoneList();
+                }
+            });
+
+            // 招募
+            inviteToZoneBtn.addEventListener('click', () => {
+                if (!currentZoneId) return;
+                const zone = zones.find(z => z.id == currentZoneId);
+                if (!zone) return;
+                const allChars = characters.filter(c => c.status === 'approved' && !(zone.members || []).includes(c.id)); // 尚未加入的
+                renderInviteCharList(allChars);
+                inviteZoneModal.style.display = 'flex';
+            });
+
+            function renderInviteCharList(list) {
+                const search = inviteSearch.value.toLowerCase();
+                const filtered = list.filter(c => c.name.toLowerCase().includes(search));
+                let html = '';
+                filtered.forEach(c => {
+                    html += `<div class="character-card" style="width:100%; margin:5px 0;" data-char-id="${c.id}" data-owner="${c.owner}">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <div style="width:50px; height:66px; border-radius:10px; overflow:hidden;"><img src="${c.avatar || '...'}" style="width:100%;height:100%;object-fit:cover;"></div>
+                            <div>${c.name} (创作者: ${c.owner})</div>
+                        </div>
+                    </div>`;
+                });
+                inviteCharList.innerHTML = html;
+                document.querySelectorAll('#inviteCharList .character-card').forEach(card => {
+                    card.addEventListener('click', () => {
+                        const charId = card.dataset.charId;
+                        const owner = card.dataset.owner;
+                        const char = characters.find(c => c.id == charId);
+                        if (!char) return;
+                        const zone = zones.find(z => z.id == currentZoneId);
+                        if (!zone) return;
+
+                        if (owner === currentUser.username) {
+                            // 自己的，直接加入
+                            if (confirm(`确定将 ${char.name} 加入星区「${zone.name}」吗？`)) {
+                                if (!zone.members) zone.members = [];
+                                if (!zone.members.includes(charId)) {
+                                    zone.members.push(charId);
+                                    char.zoneId = zone.id; // 可选标记
+                                }
+                                saveToStorage();
+                                inviteZoneModal.style.display = 'none';
+                                showNotification('已加入星区');
+                            }
+                        } else {
+                            // 别人的，发送邀请
+                            const inv = {
+                                id: Date.now() + Math.random(),
+                                zoneId: currentZoneId,
+                                charId,
+                                fromUser: currentUser.username,
+                                toUser: owner,
+                                status: 'pending'
+                            };
+                            zoneInvitations.push(inv);
+                            saveToStorage();
+                            inviteZoneModal.style.display = 'none';
+                            showNotification('邀请已发送');
+                        }
+                    });
+                });
+            }
+
+            inviteSearch.addEventListener('input', () => {
+                if (currentZoneId) {
+                    const zone = zones.find(z => z.id == currentZoneId);
+                    const allChars = characters.filter(c => c.status === 'approved' && !(zone.members || []).includes(c.id));
+                    renderInviteCharList(allChars);
+                }
+            });
+
+            closeInviteBtn.addEventListener('click', () => {
+                inviteZoneModal.style.display = 'none';
+            });
+
+            closeZoneDetailBtn.addEventListener('click', () => {
+                zoneDetailModal.style.display = 'none';
+            });
+
+            // 搜索按钮
+            zoneSearchBtn.addEventListener('click', () => {
+                starZoneSearchQuery = zoneSearchInput.value.trim();
+                if (isAuthor) {
+                    // 作者可以搜索用户名
+                    const matchedUsers = users.filter(u => u.username.toLowerCase().includes(starZoneSearchQuery.toLowerCase()));
+                    let userHtml = '<div class="zone-list">';
+                    matchedUsers.forEach(u => {
+                        userHtml += `<div class="zone-item" data-username="${u.username}">
+                            <strong>${u.username}</strong> ${u.title || ''}
+                            <br><button class="modal-btn" onclick="openMessageModal('${u.username}')">私信</button>
+                            <button class="modal-btn" onclick="banUser('${u.username}')">封禁</button>
+                        </div>`;
+                    });
+                    userHtml += '</div>';
+                    zoneListContainer.innerHTML = userHtml;
+                } else {
+                    // 读者只显示星区和人设，不显示用户
+                    renderStarZoneGrid();
+                }
+            });
+
+            // 打开私信模态框
+            window.openMessageModal = (username) => {
+                messageRecipient.value = username;
+                messageContent.value = '';
+                messageModal.style.display = 'flex';
+            };
+
+            sendMessageBtn.addEventListener('click', () => {
+                const to = messageRecipient.value;
+                const content = messageContent.value.trim();
+                if (!content) return;
+                const msg = {
+                    id: Date.now() + Math.random(),
+                    from: currentUser.username,
+                    to,
+                    content,
+                    time: Date.now(),
+                    read: false
+                };
+                messages.push(msg);
+                saveToStorage();
+                messageModal.style.display = 'none';
+                showNotification('私信已发送');
+            });
+
+            banUserBtn.addEventListener('click', () => {
+                const username = messageRecipient.value;
+                if (!bannedUsers.includes(username)) {
+                    bannedUsers.push(username);
+                    saveToStorage();
+                    showNotification(`用户 ${username} 已被封禁`);
+                }
+                messageModal.style.display = 'none';
+            });
+
+            closeMessageBtn.addEventListener('click', () => {
+                messageModal.style.display = 'none';
+            });
+
+            // 排序
+            sortBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    sortBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    starZoneSort = btn.dataset.sort;
+                    renderStarZoneGrid();
+                });
+            });
+
+            // 星区入口
+            showStarZoneBtn.addEventListener('click', () => {
+                starZonePanel.style.transform = 'translateY(0)';
+                starZonePanel.classList.add('active');
+                renderStarZone();
+            });
+            starZoneClose.addEventListener('click', () => {
+                starZonePanel.classList.remove('active');
+                starZonePanel.style.transform = 'translateY(100%)';
+            });
+
+            // ---------- 详情抽屉 ----------
+            function showCharacterDetail(id) {
+                const c = characters.find(ch => ch.id == id);
+                if (!c) return;
+                currentOcId = id;
+                const rels = relations.filter(r => r.fromId == id || r.toId == id).map(r => {
+                    const otherId = r.fromId == id ? r.toId : r.fromId;
+                    const other = characters.find(ch => ch.id == otherId);
+                    const desc = (r.fromId == id) ? r.forwardDesc : r.backwardDesc;
+                    return `<span class="relation-link" data-id="${otherId}" style="color:#b59eff; text-decoration:underline;">${other ? other.name : '?'}</span> · ${desc || '无描述'}`;
+                }).join('<br>') || '暂无关系';
+
+                const ocComments = comments.filter(cmt => cmt.ocId == id).sort((a,b) => b.time - a.time);
+                const commentsHtml = ocComments.map(cmt => {
+                    const replies = comments.filter(r => r.replyTo == cmt.id);
+                    const repliesHtml = replies.map(r => `
+                        <div class="comment-reply">
+                            <span class="comment-author">${r.username} 回复:</span> ${r.content}
+                            ${isAuthor ? `<i class="fas fa-trash" style="float:right; color:#ff6b8b;" onclick="deleteComment('${r.id}')"></i>` : ''}
+                        </div>
+                    `).join('');
+                    return `
+                        <div class="comment-item">
+                            <span class="comment-author">${cmt.username}</span>
+                            <span class="comment-time">${new Date(cmt.time).toLocaleString()}</span>
+                            <div class="comment-content">${cmt.content}</div>
+                            ${repliesHtml}
+                            ${isAuthor ? `<i class="fas fa-reply" style="color:#b59eff; margin-left:10px; cursor:pointer;" onclick="openReplyModal('${cmt.id}')"></i>` : ''}
+                            ${isAuthor ? `<i class="fas fa-trash" style="float:right; color:#ff6b8b; cursor:pointer;" onclick="deleteComment('${cmt.id}')"></i>` : ''}
+                        </div>
+                    `;
+                }).join('') || '<div>暂无评论</div>';
+
+                const avatarSrc = c.avatar || '...';
+                let editable = false;
+                if (isAuthor && c.owner === 'DRB鸟') editable = true;
+                if (!isAuthor && currentUser && c.owner === currentUser.username) editable = true;
+
+                drawerContent.innerHTML = `
+                    <div style="display:flex; gap:20px; align-items:center; margin-bottom:20px;">
+                        <div style="width:90px; height:120px; border-radius:30px; overflow:hidden; border:3px solid #ad8aff;"><img src="${avatarSrc}" style="width:100%;height:100%;object-fit:cover;"></div>
+                        <div><div style="font-size:40px;font-weight:bold;">${c.name}</div><div style="font-size:20px;">${c.age} · ${c.role}</div></div>
+                    </div>
+                    <div style="background:#1f1242; border-radius:28px; padding:18px; margin-bottom:14px;">
+                        <p><i class="fas fa-heart" style="color:#ffb3d9;"></i> <strong>喜好：</strong>${c.likes || '无'}</p>
+                        <p><i class="fas fa-skull" style="color:#b59eff;"></i> <strong>缺点：</strong>${c.weaknesses || '无'}</p>
+                        <p><strong>背景：</strong>${c.bio}</p>
+                    </div>
+                    <div style="border-left:4px solid #b084ff; padding-left:16px; margin-bottom:20px;">
+                        <strong>📜 关系网：</strong><br><div id="relationsList">${rels}</div>
+                    </div>
+                    <div style="margin: 20px 0;">
+                        <button class="modal-btn" id="addRelationBtn">+ 添加关系</button>
+                    </div>
+                    <div class="comments-section">
+                        <div class="comments-header">
+                            <h3>💬 评论</h3>
+                            <span class="comments-toggle" onclick="toggleComments(this)">▼</span>
+                        </div>
+                        <div class="comments-body" style="display:block;">
+                            <input type="text" class="comments-search" placeholder="搜索评论..." oninput="searchComments(this.value, '${id}')">
+                            <div class="comments-list" id="commentsList-${id}">
+                                ${commentsHtml}
+                            </div>
+                            <div class="add-comment">
+                                <input type="text" id="newComment-${id}" placeholder="写评论...">
+                                <button onclick="addComment('${id}')">发送</button>
+                            </div>
+                        </div>
+                    </div>
+                    ${editable ? `<div style="display:flex; justify-content:flex-end; margin-top:20px;">
+                        <i class="fas fa-pen" style="font-size:28px; color:#cab8ff; cursor:pointer;" onclick="openCharacterModalForEdit('${c.id}')"></i>
+                    </div>` : ''}
+                `;
+                drawer.classList.add('active');
+                drawerOverlay.style.display = 'block';
+
+                document.querySelectorAll('#relationsList .relation-link').forEach(link => {
+                    link.addEventListener('click', () => {
+                        const otherId = link.dataset.id;
+                        showCharacterDetail(otherId);
+                    });
+                });
+
+                document.getElementById('addRelationBtn').addEventListener('click', () => {
+                    pendingRelationFromId = id;
+                    openSelectCharModal(id);
+                });
+            }
+
+            // 评论函数
+            window.toggleComments = (el) => {
+                const body = el.closest('.comments-header').nextElementSibling;
+                if (body.style.display === 'none') {
+                    body.style.display = 'block';
+                    el.innerText = '▼';
+                } else {
+                    body.style.display = 'none';
+                    el.innerText = '▶';
+                }
+            };
+            window.searchComments = (keyword, ocId) => {
+                const list = document.getElementById(`commentsList-${ocId}`);
+                if (!list) return;
+                const items = list.querySelectorAll('.comment-item');
+                items.forEach(item => {
+                    const text = item.innerText;
+                    if (text.includes(keyword)) item.style.display = 'block';
+                    else item.style.display = 'none';
+                });
+            };
+            window.addComment = (ocId) => {
+                const input = document.getElementById(`newComment-${ocId}`);
+                const content = input.value.trim();
+                if (!content || !currentUser) return;
+                const newComment = { id: Date.now() + Math.random(), ocId, username: currentUser.username, content, time: Date.now(), replyTo: null };
+                comments.push(newComment);
+                saveToStorage();
+                showCharacterDetail(ocId);
+            };
+            window.openReplyModal = (commentId) => {
+                currentReplyCommentId = commentId;
+                replyModal.style.display = 'flex';
+            };
+            window.deleteComment = (commentId) => {
+                if (!isAuthor) return;
+                comments = comments.filter(c => c.id != commentId && c.replyTo != commentId);
+                saveToStorage();
+                showCharacterDetail(currentOcId);
+            };
+            saveReplyBtn.addEventListener('click', () => {
+                const content = replyContent.value.trim();
+                if (!content || !currentReplyCommentId || !currentUser) return;
+                const newReply = { id: Date.now() + Math.random(), ocId: currentOcId, username: currentUser.username, content, time: Date.now(), replyTo: currentReplyCommentId };
+                comments.push(newReply);
+                saveToStorage();
+                replyModal.style.display = 'none';
+                replyContent.value = '';
+                showCharacterDetail(currentOcId);
+            });
+            cancelReplyBtn.addEventListener('click', () => {
+                replyModal.style.display = 'none';
+                replyContent.value = '';
+            });
+
+            closeDrawerBtn.addEventListener('click', () => {
+                drawer.classList.remove('active');
+                drawerOverlay.style.display = 'none';
+            });
+            drawerOverlay.addEventListener('click', () => {
+                drawer.classList.remove('active');
+                drawerOverlay.style.display = 'none';
+            });
+
+            // 世界观
+            showWorldviewBtn.addEventListener('click', () => {
+                drawerContent.innerHTML = `
+                    <h2 style="font-size:44px;font-family:'Cinzel';color:#cbb2ff;">📜 ${worldview.name}</h2>
+                    <div style="border-left:6px solid #9d7bf2; padding-left:20px; font-size:22px; margin:20px 0;">${worldview.desc}</div>
+                    <p style="color:#9b83d0;">—— 银河在此凝固 ——</p>
+                `;
+                drawer.classList.add('active');
+                drawerOverlay.style.display = 'block';
+            });
+
+            // ---------- 关系建立 ----------
+            function openSelectCharModal(fromId) {
+                const fromChar = characters.find(c => c.id == fromId);
+                if (!fromChar) return;
+                const others = characters.filter(c => c.id != fromId && c.status === 'approved');
+                renderCharList(others, fromId);
+                selectCharModal.style.display = 'flex';
+            }
+
+            function renderCharList(list, fromId) {
+                const searchTerm = searchCharInput.value.toLowerCase();
+                const filtered = list.filter(c => c.name.toLowerCase().includes(searchTerm));
+                let html = '';
+                filtered.forEach(c => {
+                    html += `<div class="character-card" style="width:100%; margin:5px 0;" data-target-id="${c.id}">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <div style="width:50px; height:66px; border-radius:10px; overflow:hidden;"><img src="${c.avatar || '...'}" style="width:100%;height:100%;object-fit:cover;"></div>
+                            <div>${c.name} (by ${c.owner})</div>
+                        </div>
+                    </div>`;
+                });
+                charList.innerHTML = html;
+                document.querySelectorAll('#charList .character-card').forEach(card => {
+                    card.addEventListener('click', () => {
+                        const targetId = card.dataset.targetId;
+                        selectCharModal.style.display = 'none';
+                        handleRelationCreation(fromId, targetId);
+                    });
+                });
+            }
+
+            searchCharInput.addEventListener('input', () => {
+                if (pendingRelationFromId) {
+                    const others = characters.filter(c => c.id != pendingRelationFromId && c.status === 'approved');
+                    renderCharList(others, pendingRelationFromId);
+                }
+            });
+
+            cancelSelectCharBtn.addEventListener('click', () => {
+                selectCharModal.style.display = 'none';
+            });
+
+            function handleRelationCreation(fromId, toId) {
+                const fromChar = characters.find(c => c.id == fromId);
+                const toChar = characters.find(c => c.id == toId);
+                if (!fromChar || !toChar) return;
+
+                if (fromChar.owner === toChar.owner || isAuthor) {
+                    pendingFromId = fromId;
+                    pendingToId = toId;
+                    relationEditBetween.innerText = `${fromChar.name} ⇢ ${toChar.name}`;
+                    relationForwardDesc.value = '';
+                    relationBackwardDesc.value = '';
+                    currentRelationId = null;
+                    relationEditModal.style.display = 'flex';
+                } else {
+                    relationEditBetween.innerText = `${fromChar.name} ⇢ ${toChar.name}`;
+                    relationForwardDesc.value = '';
+                    relationBackwardDesc.value = '';
+                    currentRelationId = null;
+                    window.currentRelationEditMode = 'request';
+                    window.requestFromId = fromId;
+                    window.requestToId = toId;
+                    relationEditModal.style.display = 'flex';
+                }
+            }
+
+            updateRelationBtn.addEventListener('click', () => {
+                const forward = relationForwardDesc.value.trim();
+                const backward = relationBackwardDesc.value.trim();
+
+                if (window.currentRelationEditMode === 'request') {
+                    const req = {
+                        id: Date.now() + Math.random(),
+                        fromId: window.requestFromId,
+                        toId: window.requestToId,
+                        fromDesc: forward,
+                        toDesc: backward,
+                        status: 'pending'
+                    };
+                    relationRequests.push(req);
+                    saveToStorage();
+                    alert('关系请求已发送，等待对方同意');
+                } else if (currentRelationId) {
+                    const rel = relations.find(r => r.id == currentRelationId);
+                    if (rel) { rel.forwardDesc = forward; rel.backwardDesc = backward; }
+                } else if (pendingFromId && pendingToId) {
+                    const newRel = {
+                        id: Date.now() + Math.random(),
+                        fromId: pendingFromId,
+                        toId: pendingToId,
+                        forwardDesc: forward,
+                        backwardDesc: backward
+                    };
+                    relations.push(newRel);
+                }
+                saveToStorage();
+                relationEditModal.style.display = 'none';
+                pendingFromId = pendingToId = null;
+                currentRelationId = null;
+                window.currentRelationEditMode = null;
+                window.requestFromId = null;
+                window.requestToId = null;
+                if (currentOcId) showCharacterDetail(currentOcId);
+            });
+
+            cancelRelationEditBtn.addEventListener('click', () => {
+                relationEditModal.style.display = 'none';
+                pendingFromId = pendingToId = null;
+                currentRelationId = null;
+                window.currentRelationEditMode = null;
+                window.requestFromId = null;
+                window.requestToId = null;
+            });
+
+            // ---------- 关系网 (清晰静态布局) ----------
+            function layoutNodes(chars) {
+                const count = chars.length;
+                const nodes = [];
+                const centerX = window.innerWidth / 2;
+                const centerY = window.innerHeight / 2;
+                const radius = Math.min(window.innerWidth, window.innerHeight) * 0.3;
+                
+                if (count === 0) return nodes;
+                if (count === 1) {
+                    nodes.push({ x: centerX, y: centerY, radius: 40 });
+                } else {
+                    // 均匀分布在圆周上
+                    for (let i = 0; i < count; i++) {
+                        const angle = (i / count) * 2 * Math.PI;
+                        nodes.push({
+                            x: centerX + radius * Math.cos(angle),
+                            y: centerY + radius * Math.sin(angle),
+                            radius: 40
+                        });
+                    }
+                }
+                return nodes;
+            }
+
+            function drawNet(zone) {
+                const ctxNet = netCanvas.getContext('2d');
+                const w = window.innerWidth;
+                const h = window.innerHeight;
+                // 设置canvas尺寸为显示尺寸的2倍以提高清晰度
+                netCanvas.width = w * 2;
+                netCanvas.height = h * 2;
+                netCanvas.style.width = w + 'px';
+                netCanvas.style.height = h + 'px';
+                ctxNet.scale(2, 2);
+                
+                ctxNet.clearRect(0, 0, w, h);
+                
+                // 获取该区的人设
+                let chars;
+                if (zone === 'main') {
+                    chars = characters.filter(c => 
+                        c.status === 'approved' && 
+                        (c.isAuthor || c.zoneId === 'main')
+                    );
+                } else {
+                    chars = characters.filter(c => 
+                        !c.isAuthor && c.status === 'approved' && c.zoneId !== 'main'
+                    );
+                }
+
+                // 布局节点
+                const nodes = layoutNodes(chars);
+                const nodeMap = new Map();
+                chars.forEach((c, index) => {
+                    nodeMap.set(c.id, { ...nodes[index], char: c });
+                });
+
+                // 绘制关系线
+                ctxNet.strokeStyle = '#d9b0ff';
+                ctxNet.lineWidth = 2;
+                ctxNet.shadowColor = '#bf8aff';
+                ctxNet.shadowBlur = 10;
+                ctxNet.setLineDash([5, 5]);
+                relations.forEach(rel => {
+                    const fromNode = nodeMap.get(rel.fromId);
+                    const toNode = nodeMap.get(rel.toId);
+                    if (fromNode && toNode) {
+                        ctxNet.beginPath();
+                        ctxNet.moveTo(fromNode.x, fromNode.y);
+                        ctxNet.lineTo(toNode.x, toNode.y);
+                        ctxNet.stroke();
+                        ctxNet.font = '16px "Cormorant Garamond"';
+                        ctxNet.fillStyle = '#f0e9ff';
+                        ctxNet.shadowBlur = 15;
+                        const midX = (fromNode.x + toNode.x) / 2;
+                        const midY = (fromNode.y + toNode.y) / 2;
+                        ctxNet.fillText(rel.forwardDesc || '', midX - 30, midY - 15);
+                        ctxNet.fillText(rel.backwardDesc || '', midX - 30, midY + 20);
+                    }
+                });
+                ctxNet.setLineDash([]);
+
+                // 绘制头像
+                nodeMap.forEach(node => {
+                    ctxNet.save();
+                    ctxNet.beginPath();
+                    ctxNet.arc(node.x, node.y, node.radius, 0, 2*Math.PI);
+                    ctxNet.clip();
+                    const img = new Image();
+                    img.src = node.char.avatar || '...';
+                    ctxNet.drawImage(img, node.x - node.radius, node.y - node.radius, node.radius*2, node.radius*2);
+                    ctxNet.restore();
+                    ctxNet.shadowBlur = 20;
+                    ctxNet.strokeStyle = '#fff';
+                    ctxNet.lineWidth = 2;
+                    ctxNet.beginPath();
+                    ctxNet.arc(node.x, node.y, node.radius, 0, 2*Math.PI);
+                    ctxNet.stroke();
+                    ctxNet.font = '18px "Cormorant Garamond"';
+                    ctxNet.fillStyle = '#ede2ff';
+                    ctxNet.shadowBlur = 10;
+                    ctxNet.fillText(node.char.name, node.x - 30, node.y + node.radius + 20);
+                });
+            }
+
+            showNetBtn.addEventListener('click', () => {
+                fullscreenNet.classList.add('active');
+                currentNetZone = 'main';
+                netTabs.forEach(t => t.classList.remove('active'));
+                document.querySelector('.net-tab[data-zone="main"]').classList.add('active');
+                drawNet('main');
+            });
+
+            netTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    netTabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    currentNetZone = tab.dataset.zone;
+                    drawNet(currentNetZone);
+                });
+            });
+
+            netClose.addEventListener('click', () => {
+                fullscreenNet.classList.remove('active');
+            });
+
+            netCanvas.addEventListener('click', (e) => {
+                const rect = netCanvas.getBoundingClientRect();
+                const scaleX = netCanvas.width / rect.width;
+                const scaleY = netCanvas.height / rect.height;
+                const clickX = (e.clientX - rect.left) * (netCanvas.width / rect.width) / 2; // 因为缩放2倍
+                const clickY = (e.clientY - rect.top) * (netCanvas.height / rect.height) / 2;
+                
+                // 重新获取节点位置（需要从drawNet中获取，但这里简单重新计算）
+                const zone = currentNetZone;
+                let chars;
+                if (zone === 'main') {
+                    chars = characters.filter(c => 
+                        c.status === 'approved' && 
+                        (c.isAuthor || c.zoneId === 'main')
+                    );
+                } else {
+                    chars = characters.filter(c => 
+                        !c.isAuthor && c.status === 'approved' && c.zoneId !== 'main'
+                    );
+                }
+                const nodes = layoutNodes(chars);
+                chars.forEach((c, index) => {
+                    const node = nodes[index];
+                    const dx = clickX - node.x;
+                    const dy = clickY - node.y;
+                    if (Math.sqrt(dx*dx + dy*dy) <= 40) {
+                        showCharacterDetail(c.id);
+                    }
+                });
+            });
+
+            // 读者提交人设
+            readerSubmitBtn.addEventListener('click', () => {
+                readerCharName.value = ''; readerCharAge.value = ''; readerCharRole.value = '';
+                readerCharLikes.value = ''; readerCharWeak.value = ''; readerCharBio.value = '';
+                readerAvatarPreview.src = '';
+                requestMainZone.checked = false;
+                readerSubmitModal.style.display = 'flex';
+            });
+            closeReaderSubmitBtn.addEventListener('click', () => readerSubmitModal.style.display = 'none');
+            readerAvatarUpload.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file && readerAvatarPreview) {
+                    const reader = new FileReader();
+                    reader.onload = (ev) => { readerAvatarPreview.src = ev.target.result; };
+                    reader.readAsDataURL(file);
+                }
+            });
+            submitCharacterBtn.addEventListener('click', () => {
+                const name = readerCharName.value.trim() || '未命名';
+                const age = readerCharAge.value.trim() || '??';
+                const role = readerCharRole.value.trim() || '旅人';
+                const likes = readerCharLikes.value.trim();
+                const weaknesses = readerCharWeak.value.trim();
+                const bio = readerCharBio.value.trim() || '尚未记录';
+                const avatar = readerAvatarPreview ? readerAvatarPreview.src : '';
+                const requestMain = requestMainZone.checked;
+
+                const newPending = {
+                    id: Date.now() + Math.random(),
+                    reader: currentUser.username,
+                    data: { name, age, role, likes, weaknesses, bio, avatar },
+                    requestMain,
+                    status: 'pending'
+                };
+                pendingCharacters.push(newPending);
+                saveToStorage();
+                readerSubmitModal.style.display = 'none';
+                alert('已提交，等待作者审核');
+            });
+
+            // 作者添加人设
+            openCharBtn.addEventListener('click', () => {
+                editingCharId = null;
+                charModalTitle.innerText = '✦ 新·人设 ✦';
+                charNameInp.value = ''; charAgeInp.value = ''; charRoleInp.value = ''; 
+                charLikesInp.value = ''; charWeakInp.value = ''; charBioInp.value = '';
+                avatarPreviewImg.src = ''; avatarUpload.value = '';
+                charModal.style.display = 'flex';
+            });
+            saveCharacter.addEventListener('click', () => {
+                const name = charNameInp.value.trim() || '未命名';
+                const age = charAgeInp.value.trim() || '??';
+                const role = charRoleInp.value.trim() || '旅人';
+                const likes = charLikesInp.value.trim();
+                const weaknesses = charWeakInp.value.trim();
+                const bio = charBioInp.value.trim() || '尚未记录';
+                const avatar = avatarPreviewImg ? avatarPreviewImg.src : '';
+
+                if (editingCharId) {
+                    const idx = characters.findIndex(c => c.id == editingCharId);
+                    if (idx !== -1) {
+                        characters[idx] = { ...characters[idx], name, age, role, likes, weaknesses, bio, avatar };
+                    }
+                } else {
+                    const newId = Date.now() + Math.random();
+                    characters.push({ id: newId, name, age, role, likes, weaknesses, bio, avatar, owner: 'DRB鸟', isAuthor: true, status: 'approved', createdAt: Date.now(), likes: [] });
+                }
+                saveToStorage();
+                renderMainGrid();
+                charModal.style.display = 'none';
+            });
+            window.openCharacterModalForEdit = (id) => {
+                const c = characters.find(ch => ch.id == id);
+                if (!c) return;
+                editingCharId = id;
+                charModalTitle.innerText = '✦ 编辑人设 ✦';
+                charNameInp.value = c.name || '';
+                charAgeInp.value = c.age || '';
+                charRoleInp.value = c.role || '';
+                charLikesInp.value = c.likes || '';
+                charWeakInp.value = c.weaknesses || '';
+                charBioInp.value = c.bio || '';
+                avatarPreviewImg.src = c.avatar || '';
+                charModal.style.display = 'flex';
+            };
+
+            avatarUpload.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file && avatarPreviewImg) {
+                    const reader = new FileReader();
+                    reader.onload = (ev) => { avatarPreviewImg.src = ev.target.result; };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // 世界观编辑
+            openWorldviewBtn.addEventListener('click', () => {
+                worldNameInp.value = worldview.name;
+                worldDescInp.value = worldview.desc;
+                wvModal.style.display = 'flex';
+            });
+            saveWorldview.addEventListener('click', () => {
+                worldview.name = worldNameInp.value.trim() || '星尘纪';
+                worldview.desc = worldDescInp.value.trim() || '...';
+                saveToStorage();
+                wvModal.style.display = 'none';
+            });
+            closeWorldviewBtn.addEventListener('click', () => wvModal.style.display = 'none');
+            closeCharBtn.addEventListener('click', () => charModal.style.display = 'none');
+
+            // 审核模态框
+            function openReviewModal(pendingId) {
+                const pending = pendingCharacters.find(p => p.id == pendingId);
+                if (!pending) return;
+                currentReviewId = pendingId;
+                const data = pending.data;
+                reviewContent.innerHTML = `
+                    <p><strong>申请人:</strong> ${pending.reader}</p>
+                    <p><strong>姓名:</strong> ${data.name}</p>
+                    <p><strong>年龄:</strong> ${data.age}</p>
+                    <p><strong>身份:</strong> ${data.role}</p>
+                    <p><strong>喜好:</strong> ${data.likes}</p>
+                    <p><strong>缺点:</strong> ${data.weaknesses}</p>
+                    <p><strong>背景:</strong> ${data.bio}</p>
+                    <img src="${data.avatar}" style="width:100px; height:133px; object-fit:cover; border-radius:20px;">
+                `;
+                rejectReasonField.style.display = 'none';
+                reviewModal.style.display = 'flex';
+            }
+
+            approveBtn.addEventListener('click', () => {
+                if (!currentReviewId) return;
+                const pending = pendingCharacters.find(p => p.id == currentReviewId);
+                if (pending) {
+                    const targetZone = pending.requestMain ? 'main' : null;
+                    const newChar = {
+                        ...pending.data,
+                        id: Date.now() + Math.random(),
+                        owner: pending.reader,
+                        isAuthor: false,
+                        status: 'approved',
+                        requestMain: pending.requestMain,
+                        createdAt: Date.now(),
+                        likes: [],
+                        zoneId: targetZone
+                    };
+                    characters.push(newChar);
+                    pending.status = 'approved';
+                    pendingCharacters = pendingCharacters.filter(p => p.id != currentReviewId);
+                    saveToStorage();
+                    if (starZonePanel.classList.contains('active')) renderStarZone();
+                    renderMainGrid();
+                }
+                reviewModal.style.display = 'none';
+                currentReviewId = null;
+            });
+
+            rejectBtn.addEventListener('click', () => {
+                if (rejectReasonField.style.display === 'none') {
+                    rejectReasonField.style.display = 'block';
+                } else {
+                    const reason = rejectReason.value.trim() || '未说明';
+                    const pending = pendingCharacters.find(p => p.id == currentReviewId);
+                    if (pending) {
+                        pending.status = 'rejected';
+                        pending.rejectReason = reason;
+                        saveToStorage();
+                        if (starZonePanel.classList.contains('active')) renderStarZone();
+                    }
+                    reviewModal.style.display = 'none';
+                    currentReviewId = null;
+                    rejectReasonField.style.display = 'none';
+                    rejectReason.value = '';
+                }
+            });
+
+            cancelReviewBtn.addEventListener('click', () => {
+                reviewModal.style.display = 'none';
+                currentReviewId = null;
+                rejectReasonField.style.display = 'none';
+                rejectReason.value = '';
+            });
+
+            // 关闭模态框通用
+            window.addEventListener('click', (e) => {
+                if (e.target === wvModal) wvModal.style.display = 'none';
+                if (e.target === charModal) charModal.style.display = 'none';
+                if (e.target === relationEditModal) relationEditModal.style.display = 'none';
+                if (e.target === replyModal) replyModal.style.display = 'none';
+                if (e.target === readerSubmitModal) readerSubmitModal.style.display = 'none';
+                if (e.target === selectCharModal) selectCharModal.style.display = 'none';
+                if (e.target === requestModal) requestModal.style.display = 'none';
+                if (e.target === createZoneModal) createZoneModal.style.display = 'none';
+                if (e.target === inviteZoneModal) inviteZoneModal.style.display = 'none';
+                if (e.target === zoneDetailModal) zoneDetailModal.style.display = 'none';
+                if (e.target === messageModal) messageModal.style.display = 'none';
+                if (e.target === inboxModal) inboxModal.style.display = 'none';
+                if (e.target === reviewModal) reviewModal.style.display = 'none';
+            });
+
+            // 初始化
+            loadFromStorage();
+        })();
+    </script>
+</body>
+</html>
